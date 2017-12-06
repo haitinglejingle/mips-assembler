@@ -12,8 +12,25 @@
 #include <stdlib.h>
 #include <string>
 #include <vector>
+#include "instructions.h"
+
+void R_type_test();
 
 int main (int argc, char*argv[]) 
 {
-    for (int i = 0; i < argc; fprintf(stdout,"%s\n",argv[i++])); 
+    (void) argc; 
+    (void) argv; 
+    R_type_test();
 }
+
+
+void R_type_test()
+{
+    struct R_Type test;
+    *((int*)&test)=0;
+    test.Op     = 0b000010;
+    for(int i = 0; i < 4; fputc(((char*)&test)[i++],stdout));
+
+}
+
+
