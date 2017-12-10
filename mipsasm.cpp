@@ -57,7 +57,7 @@ void MipsAssembler::SecondPass()
     for (int i = 0; i < len; ++i) { // i is the word address
         opcode = ""; one = ""; two = ""; three = ""; offset = "";
         GetWords(i, opcode, one, two, three, offset);
-        cout << opcode << endl;
+//      you can print the strings here to see them
     }
 }
 
