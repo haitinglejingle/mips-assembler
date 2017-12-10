@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <algorithm>
 #include "mipsasm.h"
 
 using namespace std;
@@ -58,6 +59,11 @@ void MipsAssembler::SecondPass()
         opcode = ""; one = ""; two = ""; three = ""; offset = "";
         GetWords(i, opcode, one, two, three, offset);
 //      you can print the strings here to see them
+//        cout << "opcode: " << opcode << endl
+//             << "one: " << one << endl
+//             << "two: " << two << endl
+//             << "three: " << three << endl
+//             << "offset: " << offset << endl;
     }
 }
 
@@ -84,6 +90,7 @@ void MipsAssembler::GetWords(int wordAddress, string& opcode,
     if (!iss.eof()) iss >> three;
     else three = "";
 
+    EnsureLowercase(opcode, one, two, three, offset);
     // clean up
     if (two != "") {
         one.pop_back();  // get rid of comma
@@ -100,4 +107,13 @@ void MipsAssembler::GetWords(int wordAddress, string& opcode,
         }
     }
     if (three != "") two.pop_back();  // get rid of comma
+}
+
+void MipsAssembler::EnsureLowercase(string& opcode, string& one, string& two, 
+        string& three, string& offset)
+{
+    transform(opcode.begin(), opcode.end(), opcode.begin(), ::tolower);
+    transform(one.begin(), one.end(), one.begin(), ::tolower);
+    transform(two.begin(), two.end(), two.begin(), ::tolower);
+    transform(three.begin(), three.end(), three.begin(), ::tolower);
 }

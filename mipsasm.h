@@ -21,4 +21,6 @@ class MipsAssembler
 
         void GetWords(int wordAddress, std::string& opcode, std::string& one, 
                 std::string& two, std::string& three, std::string& offset);
+        void EnsureLowercase(std::string& opcode, std::string& one, 
+                std::string& two, std::string& three, std::string& offset);
 };
