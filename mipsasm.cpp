@@ -59,11 +59,11 @@ void MipsAssembler::SecondPass()
         opcode = ""; one = ""; two = ""; three = ""; offset = "";
         GetWords(i, opcode, one, two, three, offset);
 //      you can print the strings here to see them
-//        cout << "opcode: " << opcode << endl
-//             << "one: " << one << endl
-//             << "two: " << two << endl
-//             << "three: " << three << endl
-//             << "offset: " << offset << endl;
+        cout << "opcode: " << opcode << endl
+             << "one: " << one << endl
+             << "two: " << two << endl
+             << "three: " << three << endl
+             << "offset: " << offset << endl;
     }
 }
 
@@ -95,15 +95,9 @@ void MipsAssembler::GetWords(int wordAddress, string& opcode,
     if (two != "") {
         one.pop_back();  // get rid of comma
         if (three == "" && two.back() == ')') { // handle loads/stores
-            string junk;
-            size_t found = two.find_first_of("xX"); 
             istringstream iss2(two);
-            if (found != string::npos) {
-                two[found] = 'x';
-                getline(iss2, junk, 'x');
-            }
-                getline(iss2, offset, '(');
-                getline(iss2, two, ')');
+            getline(iss2, offset, '(');
+            getline(iss2, two, ')');
         }
     }
     if (three != "") two.pop_back();  // get rid of comma
