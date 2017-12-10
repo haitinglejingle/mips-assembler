@@ -9,7 +9,7 @@
     sub $t2, $t1, $t0
     sw $t2, 0x4($zero)
     sw $t2, 0x6($zero)
-    nop // sw -> ID
-    nop // sw -> EX
-    nop // sw -> MEM
-    nop // sw -> WB
+    nop # sw -> ID
+    nop # sw -> EX
+    nop # sw -> MEM
+    nop # sw -> WB
