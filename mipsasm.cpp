@@ -31,6 +31,7 @@ void MipsAssembler::FirstPass()
         cout << "word address is " << wAddr << endl;
         instCount = CheckFirstWord(line, wAddr); 
         for (uint32_t i = 0; i < instCount; ++i) wAddr++;
+    }
 }
 
 void MipsAssembler::FirstPass(string filename)
