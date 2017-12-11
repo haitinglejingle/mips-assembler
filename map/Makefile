@@ -15,7 +15,7 @@ IFLAGS  = $(patsubst %,-I%,$(IDIRS))
 CFLAGS  = -std=c++14 -Wall -Wextra -Werror -Wfatal-errors -pedantic $(IFLAGS)
 LDFLAGS = 
 DBFLAGS = -g -DDEBUG
-LDLIBS  = -lrt -lpthread
+LDLIBS  = -lpthread
 RM_OBJS = && rm *.o
 
 %.o: %.cpp

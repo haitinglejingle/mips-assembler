@@ -5,74 +5,103 @@
 #include <string>
 #include <algorithm>
 #include "mipsasm.h"
+#include "map/MIPS_instruction.h"
 
 using namespace std;
 
 MipsAssembler::MipsAssembler()
 {
+    InitializePseudoMap();
 }
 
 MipsAssembler::~MipsAssembler()
 {
 }
 
+/*--------*\
+ * PUBLIC *
+\*--------*/
+
 void MipsAssembler::FirstPass()
 {
-    int wordAddress = 0; 
+    uint32_t wAddr = 0;
     string line;
+    uint32_t instCount;
     while (getline(cin, line)) {
-        CheckLabel(line, wordAddress); 
-        wordAddress++;
+        cout << "word address is " << wAddr << endl;
+        instCount = CheckFirstWord(line, wAddr); 
+        for (uint32_t i = 0; i < instCount; ++wAddr) { cout << "dude";}
     }
 }
 
 void MipsAssembler::FirstPass(string filename)
 {
-    int wordAddress = 0;
+    uint32_t wAddr = 0;
     string line;
+    uint32_t instCount;
     ifstream file(filename);
     if (file) {
         while (getline(file, line)) {
-            CheckLabel(line, wordAddress); 
-            wordAddress++;
+            instCount = CheckFirstWord(line, wAddr); 
+            for (uint32_t i = 0; i < instCount; ++i) wAddr++;
         }
-    }
-}
-
-void MipsAssembler::CheckLabel(string line, int addr)
-{
-    string label;
-    istringstream iss(line);
-    prog.push_back(line);
-    iss >> label;
-    if (label.back() == ':') {
-        label.pop_back();
-        labelmap[label] = addr;
     }
 }
 
 void MipsAssembler::SecondPass()
 {
-    int len = prog.size();
-    string opcode, one, two, three, offset;
-    for (int i = 0; i < len; ++i) { // i is the word address
-        opcode = ""; one = ""; two = ""; three = ""; offset = "";
-        GetWords(i, opcode, one, two, three, offset);
+    uint32_t len = prog.size();
+    uint32_t inst;
+    string opcode, one, two, three;
+    for (uint32_t i = 0; i < len; ++i) { // i is the word address
+        opcode = ""; one = ""; two = ""; three = "";
+        GetWords(i, opcode, one, two, three);
 //      you can print the strings here to see them
-        cout << "opcode: " << opcode << endl
-             << "one: " << one << endl
-             << "two: " << two << endl
-             << "three: " << three << endl
-             << "offset: " << offset << endl;
+//        cout << "opcode: " << opcode << " "
+//             << "one: " << one << endl 
+//             << "two: " << two  << endl 
+//             << "three: " << three << endl;
+
+        inst = mi.assemble(i, opcode, one, two, three);
+        cout << inst << endl;
     }
 }
 
+/*---------*\
+ * PRIVATE *
+\*---------*/
+
+// handle labels, check for pseudocode
+// returns the number of word addresses to increment
+int MipsAssembler::CheckFirstWord(string line, int addr)
+{
+    int instCount = 0;
+    string label;
+    istringstream iss(line);
+    if (IsAsmLine(iss)) {  // return if line does not contain asm
+        instCount++;
+        prog.push_back(line); 
+        iss >> label;
+        if (label.back() == ':') {
+            label.pop_back();
+            mi.add_label(label, addr);
+        }
+    }
+    return instCount;
+}
+
+// returns that the line is neither EMPTY nor begins with a comment
+bool MipsAssembler::IsAsmLine(istringstream &line) {
+    line >> ws; // eat up leading white space
+    return !(line.eof() || line.peek() == '#');
+}
+
 // pass EMPTY strings to this - this function does not always clear old values
-void MipsAssembler::GetWords(int wordAddress, string& opcode, 
-        string& one, string& two, string& three, string& offset)
+void MipsAssembler::GetWords(uint32_t wAddr, string& opcode, 
+        string& one, string& two, string& three)
 {
     string word, line;
-    line = prog[wordAddress];
+    line = prog[wAddr];
     istringstream iss(line);
     getline(iss, line, '#');
     iss.str(line);
@@ -90,24 +119,32 @@ void MipsAssembler::GetWords(int wordAddress, string& opcode,
     if (!iss.eof()) iss >> three;
     else three = "";
 
-    EnsureLowercase(opcode, one, two, three, offset);
     // clean up
     if (two != "") {
         one.pop_back();  // get rid of comma
         if (three == "" && two.back() == ')') { // handle loads/stores
+            string temp;
             istringstream iss2(two);
-            getline(iss2, offset, '(');
-            getline(iss2, two, ')');
+            getline(iss2, temp, '(');
+            two = temp;
+            getline(iss2, three, ')');
+        } else {
+            two.pop_back();
         }
-    }
-    if (three != "") two.pop_back();  // get rid of comma
+    } 
+    //if (three != "" && ) two.pop_back();  // get rid of comma
+    
+//    HandlePseudo(wAddr, opcode, one, two, three);
 }
-
-void MipsAssembler::EnsureLowercase(string& opcode, string& one, string& two, 
-        string& three, string& offset)
+/*
+void MipsAssembler::HandlePseudo(uint32_t wAddr, string& opcode, string& one, 
+        string& two, string& three)
 {
-    transform(opcode.begin(), opcode.end(), opcode.begin(), ::tolower);
-    transform(one.begin(), one.end(), one.begin(), ::tolower);
-    transform(two.begin(), two.end(), two.begin(), ::tolower);
-    transform(three.begin(), three.end(), three.begin(), ::tolower);
+ //   if (pseudomap[opcode] == // TODO)
+}
+*/
+
+void MipsAssembler::InitializePseudoMap()
+{
+    
 }

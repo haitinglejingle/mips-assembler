@@ -1,4 +1,4 @@
-
+#pragma once
 #include <vector>
 #include <stdint.h>
 #include <stdlib.h>

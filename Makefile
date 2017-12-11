@@ -15,10 +15,10 @@ IFLAGS  = $(patsubst %,-I%,$(IDIRS))
 CFLAGS  = -std=c++11 -Wall -Wextra -Werror -Wfatal-errors -pedantic $(IFLAGS)
 LDFLAGS = 
 DBFLAGS = -g -DDEBUG
-LDLIBS  = -lrt -lpthread
+LDLIBS  = -lpthread
 RM_OBJS = && rm *.o
 
-%.o: %.cpp
+%.o: %.cpp 
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 %.o.test: %.cpp
@@ -29,11 +29,11 @@ RM_OBJS = && rm *.o
 # 	|	|	|
 # 	V	V	V
 
-EXECUTABLES = mips_assembler 
+EXECUTABLES = mipsasm
 
-MIPS_ASSEMBLER_INCLUDES  = mips_assembler.o 
+MIPS_ASSEMBLER_INCLUDES  = mipsasm.o main.o map/MIPS_instruction.o
 
-mips_assembler: $(MIPS_ASSEMBLER_INCLUDES)
+mipsasm: $(MIPS_ASSEMBLER_INCLUDES)
 	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS) $(RM_OBJS) 
 mips_assembler_test: $(patsubst %,%.test,$(MIPS_ASSEMBLER_INCLUDES))
 	$(CC) $(LDFLAGS) -o $@ $(MIPS_ASSEMBLER_INCLUDES) $(LDLIBS) $(RM_OBJS)
