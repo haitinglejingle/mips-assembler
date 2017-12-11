@@ -13,6 +13,7 @@ public:
     MIPS_instruction();
     ~MIPS_instruction();
     
+    void     add_label (std::string label, uint32_t iAddr);
     uint32_t assemble (uint32_t pc, std::string op, 
       std::string a, std::string b, std::string c);
     
@@ -38,14 +39,15 @@ private:
 
     std::map <std::string, Mnemonic_func> mnemonic_map;
     std::map <std::string, uint32_t> register_map;
+    std::map <std::string, uint32_t> label_map;
 
     uint32_t regval(std::string reg);
+    uint32_t getval(std::string reg);
     
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
  *  Internal Data                                        * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * */ 
 
-    
     struct Mnemonic_func {
         uint32_t    op;
         MnemType    type;

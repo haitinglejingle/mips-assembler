@@ -9,10 +9,10 @@
 #include <string>
 #include <map>
 #include <algorithm>
-
 #include <iostream>
-
 #include "MIPS_instruction.h"
+#define  MIPS_Err "-[\033[31;1mCRITICAL ERROR\033[0;0m]-\n\t"
+
 
 MIPS_instruction:: MIPS_instruction()
 {
@@ -31,7 +31,8 @@ uint32_t MIPS_instruction::assemble (uint32_t pc, std::string op,
     Mnemonic_func mapped_op;
     auto mapi = mnemonic_map.find(op);
     if (mapi == mnemonic_map.end()) {
-        std::cerr << "could not find mnemonic [" << op << "]\n";
+        std::cerr << MIPS_Err <<
+        "could not find mnemonic [" << op << "]\n";
         exit(EXIT_FAILURE);
     }
     mapped_op = mapi->second;
@@ -42,6 +43,23 @@ uint32_t MIPS_instruction::assemble (uint32_t pc, std::string op,
             return assemble_itype(mapped_op.op,a,b,c,mapped_op.g,pc);
         case Jtype :
             return assemble_jtype(mapped_op.op,a,b,c,mapped_op.g);
+    }
+}
+    
+void MIPS_instruction::add_label 
+(std::string label, uint32_t iAddr)
+{
+    auto label_pair = label_map.find(label);
+    if (label_pair != label_map.end()) {
+        // label is already assigned
+        std::cerr << MIPS_Err <<
+            "label \""<< label <<"\" assigned to" << 
+            " address [" << std::hex << "0x" << label_pair->second << 
+            "] and again to address [" << std::hex << "0x" << iAddr <<
+            "]\n";
+        exit(EXIT_FAILURE);
+    } else {
+        label_map.insert(std::pair<std::string,uint32_t>(label,iAddr));
     }
 }
 
@@ -65,7 +83,7 @@ uint32_t MIPS_instruction::assemble_rtype(uint32_t op, std::string a,
             instruction.Rd = 0; 
             break;
         case g3:
-            instruction.a  = stoi(c);
+            instruction.a  = getval(c);
             instruction.Rs = 0;
             instruction.Rt = regval(b);
             instruction.Rd = regval(a);
@@ -86,7 +104,7 @@ uint32_t MIPS_instruction::assemble_rtype(uint32_t op, std::string a,
             instruction.Rd = regval(a);
             break;
        default:
-            std::cerr << "invalid code";
+            std::cerr << MIPS_Err << "invalid group \n";
             break;
     }
     return *((uint32_t*)&instruction);
@@ -103,27 +121,27 @@ uint32_t MIPS_instruction::assemble_itype(uint32_t op, std::string a,
         case g1:
             instruction.Rt = regval(a);
             instruction.Rs = regval(b);
-            instruction.i  = stoi(c);
+            instruction.i  = getval(c);
             break;
         case g2:
             instruction.Rt = regval(b);
             instruction.Rs = regval(a);
-            instruction.i  = stoi(c) - (pc+1); // rel addr
+            instruction.i  = getval(c) - (pc+1); // rel addr
             break;
         case g3:
             instruction.Rt = 0;
             instruction.Rs = regval(a);
-            instruction.i  = stoi(b) - (pc+1); // rel addr
+            instruction.i  = getval(b) - (pc+1); // rel addr
             break;
         case g4:
             instruction.Rt = regval(c);
             instruction.Rs = regval(a);
-            instruction.i  = stoi(b);
+            instruction.i  = getval(b);
             break;
         case g5:
-        case g6:
-        default:
-            std::cerr << "invalid code";
+        case g6: 
+       default:
+            std::cerr << MIPS_Err << "invalid group \n";
             break;
     }
     return *((uint32_t*)&instruction);
@@ -137,15 +155,19 @@ uint32_t MIPS_instruction::assemble_jtype(uint32_t op, std::string a,
     switch (g) {
         case g1:
             instruction.op = op;
-            instruction.i  = stoi(a);
+            instruction.i  = getval(a);
             break;
         case g2:
+            // special case for NOP
+            instruction.op = op;
+            instruction.i  = 0;
+            break;
         case g3:
         case g4:
         case g5:
         case g6:
         default:
-            std::cerr << "invalid code";
+            std::cerr << MIPS_Err << "invalid group \n";
             break;
     }
     return *((uint32_t*)&instruction);
@@ -156,11 +178,21 @@ uint32_t MIPS_instruction::regval(std::string reg)
     std::transform(reg.begin(), reg.end(), reg.begin(), ::tolower);
     auto mapi = register_map.find(reg);
     if (mapi == register_map.end()) {
-        std::cerr << "could not find encoding"
+        std::cerr << MIPS_Err << "could not find encoding"
             " for register [" << reg << "]\n";
         exit(EXIT_FAILURE);
     }
     return mapi->second;
+}
+
+uint32_t MIPS_instruction::getval(std::string val)
+{
+    auto mapi = label_map.find(val);
+    if (mapi != label_map.end()) {
+        return mapi->second;
+    } else {
+        return stoi(val, nullptr, 0);
+    }
 }
 
 void   MIPS_instruction::initialize_Mnemonic_map 
@@ -177,11 +209,9 @@ void   MIPS_instruction::initialize_Register_map
 (const MIPS_instruction::Register_te *reg) 
 {
     for (int i = 0; reg[i].key != "end"; ++i) {
-
         register_map.insert(
             std::pair<std::string, uint32_t>
             (reg[i].key,reg[i].val));
-
     }
 }
 
@@ -273,13 +303,13 @@ void MIPS_instruction::initialize_tables ()
 // group 1: mneumonic i
     {"j"  , {0x02, Jtype, g1}},
     {"jal", {0x03, Jtype, g1}},
-    
+    {"nop", {0x00, Jtype, g2}},
     {"end" ,{ 111, Rtype, g1}}};
     initialize_Register_map(reg);
     initialize_Mnemonic_map(ops);
 }
 
-
+#undef MIPS_Err
 
 
 

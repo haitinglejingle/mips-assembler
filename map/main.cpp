@@ -66,6 +66,9 @@ void test1 ()
 
 void test2 ()
 {DBG;
+    MIPS_instruction mi;
+    mi.add_label("murphy", 100);
+    mi.add_label("murphy", 11);
     return;
 }
 
