@@ -3,5 +3,4 @@
 *.*~
 *.o
 *.swp
-mips_assembler
-labreport
+mipsasm
