@@ -26,9 +26,5 @@ class MipsAssembler
 
         void GetWords(uint32_t wAddr, std::string& opcode, 
                 std::string& one, std::string& two, std::string& three);
-        void HandlePseudo(uint32_t wAddr, std::string& opcode, std::string& one,
-                std::string& two, std::string& three);
-        void InitializePseudoMap();
-
         bool IsAsmLine(std::istringstream& line);
 };

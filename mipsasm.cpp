@@ -11,7 +11,6 @@ using namespace std;
 
 MipsAssembler::MipsAssembler()
 {
-    InitializePseudoMap();
 }
 
 MipsAssembler::~MipsAssembler()
@@ -28,7 +27,6 @@ void MipsAssembler::FirstPass()
     string line;
     uint32_t instCount;
     while (getline(cin, line)) {
-        cout << "word address is " << wAddr << endl;
         instCount = CheckFirstWord(line, wAddr); 
         for (uint32_t i = 0; i < instCount; ++i) wAddr++;
     }
@@ -51,7 +49,7 @@ void MipsAssembler::FirstPass(string filename)
 void MipsAssembler::SecondPass()
 {
     uint32_t len = prog.size();
-    uint32_t inst;
+    uint32_t wAddr = 0;
     string opcode, one, two, three;
     for (uint32_t i = 0; i < len; ++i) { // i is the word address
         opcode = ""; one = ""; two = ""; three = "";
@@ -62,8 +60,7 @@ void MipsAssembler::SecondPass()
 //             << "two: " << two  << endl 
 //             << "three: " << three << endl;
 
-        inst = mi.assemble(i, opcode, one, two, three);
-        cout << inst << endl;
+        wAddr+=mi.assemble(wAddr, opcode, one, two, three);
     }
 }
 
@@ -113,7 +110,6 @@ void MipsAssembler::GetWords(uint32_t wAddr, string& opcode,
     // get the strings
     if (!iss.eof()) iss >> one;
     else one = "";
-    //cout << "one is this " << one << endl;
     if (!iss.eof()) iss >> two;
     else two = "";
     if (!iss.eof()) iss >> three;
@@ -128,23 +124,8 @@ void MipsAssembler::GetWords(uint32_t wAddr, string& opcode,
             getline(iss2, temp, '(');
             two = temp;
             getline(iss2, three, ')');
-        } else {
+        } else if (three != "") {
             two.pop_back();
         }
     } 
-    //if (three != "" && ) two.pop_back();  // get rid of comma
-    
-//    HandlePseudo(wAddr, opcode, one, two, three);
-}
-/*
-void MipsAssembler::HandlePseudo(uint32_t wAddr, string& opcode, string& one, 
-        string& two, string& three)
-{
-//   if (pseudomap[opcode] == // TODO)
-}
-*/
-
-void MipsAssembler::InitializePseudoMap()
-{
-//    pseudomap[] =     
 }

@@ -2,6 +2,7 @@
  * MIPS_instruction.cpp
  */
 
+#include <bitset>
 #include <vector>
 #include <stdint.h>
 #include <stdlib.h>
@@ -25,27 +26,93 @@ MIPS_instruction::~MIPS_instruction()
     return;
 }
 
-uint32_t MIPS_instruction::assemble (uint32_t pc, std::string op, 
+// returns word addresses by which to increment
+uint32_t MIPS_instruction::assemble (uint32_t pc, std::string mnem, 
                     std::string a, std::string b, std::string c)
 {
-    Mnemonic_func mapped_op;
-    auto mapi = mnemonic_map.find(op);
-    if (mapi == mnemonic_map.end()) {
-        std::cerr << MIPS_Err <<
-        "could not find mnemonic [" << op << "]\n";
-        exit(EXIT_FAILURE);
-    }
-    mapped_op = mapi->second;
-    switch (mapped_op.type) {
-        case Rtype : 
-            return assemble_rtype(mapped_op.op,a,b,c,mapped_op.g);
-        case Itype : 
-            return assemble_itype(mapped_op.op,a,b,c,mapped_op.g,pc);
-        case Jtype :
-            return assemble_jtype(mapped_op.op,a,b,c,mapped_op.g);
-    }
+    auto mapi = mnemonic_map.find(mnem);
+    if (!(mapi == mnemonic_map.end())) { 
+        Mnemonic_func mapped_op = mapi->second;
+        printMachineCode(assemble_iformat(mapped_op, a, b, c, pc));
+        return 1; 
+    } 
+    auto pi = pseudo_map.find(mnem);  
+    if (!(pi == pseudo_map.end())) { 
+        return pseudo(pi->second, a, b, c, pc); 
+    } // will only continue if mnem was invalid
+    std::cerr << MIPS_Err << "could not find mnemonic [" << mnem << "]\n";
+    exit(EXIT_FAILURE);
 }
-    
+
+uint32_t MIPS_instruction::pseudo(PseudoInst pi_type, std::string a_, std::string b_, std::string c_, 
+        uint32_t pc)
+{
+    Mnemonic_func mapped_op;
+    std::string op, a, b, c;
+    int len = pi_type.op.size();
+    for (int i = 0; i < len; ++i) {
+        op = pi_type.op[i];         // get expanded mneumonics
+        auto mapi = mnemonic_map.find(op);  // find opcode
+        mapped_op = mapi->second;
+        a = getPseudoOperand(pi_type.a[i], a_, b_, c_);
+        b = getPseudoOperand(pi_type.b[i], a_, b_, c_);
+        c = getPseudoOperand(pi_type.c[i], a_, b_, c_);
+//        std::cout << "a: " << a << std::endl;
+//        std::cout << "b: " << b << std::endl;
+//        std::cout << "c: " << c << std::endl;
+//        std::cout << "a_: " << a_ << std::endl;
+//        std::cout << "b_: " << b_ << std::endl;
+//        std::cout << "c_: " << c_ << std::endl;
+        printMachineCode(assemble_iformat(mapped_op, a, b, c, pc));
+        pc++;
+    }
+    return len;
+}
+
+void MIPS_instruction::printMachineCode(uint32_t bin)
+{
+    std::cout << std::bitset<32>(bin) << std::endl; 
+}
+
+void MIPS_instruction::printMachineCode(uint32_t bin, uint32_t pc)
+{
+    std::cout << pc << ": " << std::bitset<32>(bin) << std::endl; 
+}
+
+uint32_t MIPS_instruction::assemble_iformat(Mnemonic_func mop, std::string a, 
+        std::string b, std::string c, uint32_t pc) 
+{
+    switch (mop.type) {
+        case Rtype : 
+            return assemble_rtype(mop.op,a,b,c,mop.g);
+        case Itype : 
+            return assemble_itype(mop.op,a,b,c,mop.g,pc);
+        case Jtype :
+            return assemble_jtype(mop.op,a,b,c,mop.g);
+    } 
+}
+
+std::string MIPS_instruction::getPseudoOperand(std::string x, std::string a, std::string b, std::string c)
+{
+    if (x != "") {
+        if (x == "a" && a != "") {
+            return a;
+        } else if (x == "b" && b != "") {
+            return b;
+        } else if (x == "c" && c != "") {
+            return c;
+        } 
+    }
+    return x; // this return is for empty string 
+}
+/*
+uint32_t MIPS_instruction::getPseudoNumWords(std::string mnem)
+{
+    auto pi = pseudo_map.find(mnem);  
+    if (
+}
+*/
+
 void MIPS_instruction::add_label 
 (std::string label, uint32_t iAddr)
 {
@@ -113,10 +180,12 @@ uint32_t MIPS_instruction::assemble_rtype(uint32_t op, std::string a,
 uint32_t MIPS_instruction::assemble_itype(uint32_t op, std::string a,
              std::string b, std::string c, SyntaxGroup g, uint32_t pc)
 {
-    (void) op; (void) a; (void) b; (void) c; (void) g; (void) pc;
+//    (void) op; (void) a; (void) b; (void) c; (void) g; (void) pc;
     
     Itype_instruction instruction;
     instruction.op = op;
+    auto mapi_b = label_map.find(b);
+    auto mapi_c = label_map.find(c);
     switch (g) {
         case g1:
             instruction.Rt = regval(a);
@@ -126,12 +195,20 @@ uint32_t MIPS_instruction::assemble_itype(uint32_t op, std::string a,
         case g2:
             instruction.Rt = regval(b);
             instruction.Rs = regval(a);
-            instruction.i  = getval(c) - (pc+1); // rel addr
+            if (mapi_c != label_map.end()) {
+                instruction.i  = getval(c) - (pc+1); // rel addr
+            } else {
+                instruction.i = stoi(c, nullptr, 0);
+            }
             break;
         case g3:
             instruction.Rt = 0;
             instruction.Rs = regval(a);
-            instruction.i  = getval(b) - (pc+1); // rel addr
+            if (mapi_b != label_map.end()) {
+                instruction.i  = getval(b) - (pc+1); // rel addr
+            } else {
+                instruction.i = stoi(b, nullptr, 0);
+            }
             break;
         case g4:
             instruction.Rt = regval(c);
@@ -212,6 +289,16 @@ void   MIPS_instruction::initialize_Register_map
         register_map.insert(
             std::pair<std::string, uint32_t>
             (reg[i].key,reg[i].val));
+    }
+}
+
+void MIPS_instruction::initalize_Pseudo_map(
+        const MIPS_instruction::Pseudo_te *psi)
+{
+    for (int i = 0; psi[i].key != "end"; ++i) {
+        pseudo_map.insert(
+                std::pair<std::string, PseudoInst>
+                (psi[i].key, psi[i].val));
     }
 }
 
@@ -305,12 +392,49 @@ void MIPS_instruction::initialize_tables ()
     {"jal", {0x03, Jtype, g1}},
     {"nop", {0x00, Jtype, g2}},
     {"end" ,{ 111, Rtype, g1}}};
+
+    std::string move_op[] = {"add"}; 
+    std::string move_a[] = {"a"};
+    std:: string move_b[] = {"b"};
+    std::string move_c[] = {"$zero"};
+    int move_len = sizeof(move_op)/sizeof(move_op[0]);
+
+    std::string bgt_op[] = {"slt", "bne"};
+    std::string bgt_a[] = {"$at", "$at"};
+    std::string bgt_b[] = {"b", "b"};
+    std::string bgt_c[] = {"a", "c"};
+    int bgt_len = sizeof(bgt_op)/sizeof(bgt_op[0]);
+
+    static const Pseudo_te psi[] = {
+    {"move",                    // 1
+        {getStringVect(move_op, move_len), 
+            getStringVect(move_a, move_len), 
+            getStringVect(move_b, move_len), 
+            getStringVect(move_c, move_len)}},
+    {"bgt",                    // 2
+        {getStringVect(bgt_op, bgt_len), 
+            getStringVect(bgt_a, bgt_len), 
+            getStringVect(bgt_b, bgt_len), 
+            getStringVect(bgt_c, bgt_len)}},
+    {"end" ,                    // last
+        {getStringVect(bgt_op, bgt_len), 
+            getStringVect(bgt_a, bgt_len), 
+            getStringVect(bgt_b, bgt_len), 
+            getStringVect(bgt_c, bgt_len)}},
+    };
     initialize_Register_map(reg);
     initialize_Mnemonic_map(ops);
+    initalize_Pseudo_map(psi);
+}
+
+std::vector<std::string> MIPS_instruction::getStringVect(std::string strArr[], 
+        int len)
+{
+    std::vector<std::string> strVect;
+    for (int i = 0; i < len; ++i) {
+        strVect.push_back(strArr[i]);
+    }
+    return strVect;
 }
 
 #undef MIPS_Err
-
-
-
-

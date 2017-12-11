@@ -39,7 +39,7 @@ mips_assembler_test: $(patsubst %,%.test,$(MIPS_ASSEMBLER_INCLUDES))
 	$(CC) $(LDFLAGS) -o $@ $(MIPS_ASSEMBLER_INCLUDES) $(LDLIBS) $(RM_OBJS)
 
 clean: 
-	rm *~ *.swp *.o $(EXECUTABLES) 2> /dev/null; true
+	rm *~ *.swp map/*.o *.o $(EXECUTABLES) 2> /dev/null; true
 
 
 
