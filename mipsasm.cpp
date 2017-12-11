@@ -140,11 +140,11 @@ void MipsAssembler::GetWords(uint32_t wAddr, string& opcode,
 void MipsAssembler::HandlePseudo(uint32_t wAddr, string& opcode, string& one, 
         string& two, string& three)
 {
- //   if (pseudomap[opcode] == // TODO)
+//   if (pseudomap[opcode] == // TODO)
 }
 */
 
 void MipsAssembler::InitializePseudoMap()
 {
-    
+//    pseudomap[] =     
 }
