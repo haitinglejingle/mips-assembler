@@ -54,9 +54,9 @@ uint32_t MIPS_instruction::pseudo(PseudoInst pi_type, std::string a_, std::strin
         op = pi_type.op[i];         // get expanded mneumonics
         auto mapi = mnemonic_map.find(op);  // find opcode
         mapped_op = mapi->second;
-        a = getPseudoOperand(pi_type.a[i], a_, b_, c_);
-        b = getPseudoOperand(pi_type.b[i], a_, b_, c_);
-        c = getPseudoOperand(pi_type.c[i], a_, b_, c_);
+//        a = getPseudoOperand(pi_type.a[i], a_, b_, c_);
+//        b = getPseudoOperand(pi_type.b[i], a_, b_, c_);
+//        c = getPseudoOperand(pi_type.c[i], a_, b_, c_);
 //        std::cout << "a: " << a << std::endl;
 //        std::cout << "b: " << b << std::endl;
 //        std::cout << "c: " << c << std::endl;
