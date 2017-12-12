@@ -44,6 +44,7 @@ void MipsAssembler::FirstPass(string filename)
             for (uint32_t i = 0; i < instCount; ++i) wAddr++;
         }
     }
+    file.close();
 }
 
 void MipsAssembler::SecondPass()
