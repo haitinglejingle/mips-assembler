@@ -74,15 +74,17 @@ void MipsAssembler::SecondPass()
 int MipsAssembler::CheckFirstWord(string line, int addr)
 {
     int instCount = 0;
-    string label;
+    string first;
     istringstream iss(line);
     if (IsAsmLine(iss)) {  // return if line does not contain asm
         instCount++;
         prog.push_back(line); 
-        iss >> label;
+        iss >> first;
         if (label.back() == ':') {
             label.pop_back();
-            mi.add_label(label, addr);
+            mi.add_label(first, addr);
+        } else if (mi.IsPseudo(first)) {
+            instCount = mi.GetPseudoNumWords(first); 
         }
     }
     return instCount;

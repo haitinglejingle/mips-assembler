@@ -105,13 +105,21 @@ std::string MIPS_instruction::getPseudoOperand(std::string x, std::string a, std
     }
     return x; // this return is for empty string 
 }
+
+// TODO
 /*
-uint32_t MIPS_instruction::getPseudoNumWords(std::string mnem)
+uint32_t MIPS_instruction::GetPseudoNumWords(std::string mnem)
 {
-    auto pi = pseudo_map.find(mnem);  
-    if (
+    return;
 }
 */
+
+/*
+bool MIPS_instruction::IsPseudo(std::string mnem)
+{
+    return;
+}
+ */
 
 void MIPS_instruction::add_label 
 (std::string label, uint32_t iAddr)

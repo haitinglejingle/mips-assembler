@@ -58,7 +58,6 @@ private:
     uint32_t assemble_iformat(Mnemonic_func mop, std::string a, std::string b, 
             std::string c, uint32_t pc);
 
-    std::vector<std::string> getStringVect(std::string strArr[], int len);
 
     void printMachineCode(uint32_t bin); // 
     void printMachineCode(uint32_t bin, uint32_t pc); // for testing 
