@@ -80,8 +80,8 @@ int MipsAssembler::CheckFirstWord(string line, int addr)
         instCount++;
         prog.push_back(line); 
         iss >> first;
-        if (label.back() == ':') {
-            label.pop_back();
+        if (first.back() == ':') {
+            first.pop_back();
             mi.add_label(first, addr);
         } else if (mi.IsPseudo(first)) {
             instCount = mi.GetPseudoNumWords(first); 

@@ -107,19 +107,20 @@ std::string MIPS_instruction::getPseudoOperand(std::string x, std::string a, std
 }
 
 // TODO
-/*
 uint32_t MIPS_instruction::GetPseudoNumWords(std::string mnem)
 {
-    return;
+    auto pi = pseudo_map.find(mnem);
+    if (pi == pseudo_map.end()) {
+         std::cerr << MIPS_Err << "not pseudo\n";
+    }
+    return pi->second.op.size();
 }
-*/
 
-/*
 bool MIPS_instruction::IsPseudo(std::string mnem)
 {
-    return;
+    auto   pi = pseudo_map.find(mnem);
+    return pi != pseudo_map.end();
 }
- */
 
 void MIPS_instruction::add_label 
 (std::string label, uint32_t iAddr)

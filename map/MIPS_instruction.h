@@ -17,6 +17,9 @@ public:
     uint32_t assemble (uint32_t pc, std::string op, 
       std::string a, std::string b, std::string c);
     
+    uint32_t GetPseudoNumWords(std::string mnem);
+    bool     IsPseudo(std::string mnem);
+
 private:
 
     enum   MnemType    {Rtype, Itype, Jtype};
@@ -47,7 +50,6 @@ private:
     
     uint32_t regval(std::string reg);
     uint32_t getval(std::string reg);
-    
 
     uint32_t pseudo(PseudoInst pi_type, std::string a_, std::string b_, 
             std::string c_, uint32_t pc);
@@ -58,6 +60,8 @@ private:
     uint32_t assemble_iformat(Mnemonic_func mop, std::string a, std::string b, 
             std::string c, uint32_t pc);
 
+std::vector<std::string> getStringVect(std::string strArr[], 
+        int len);
 
     void printMachineCode(uint32_t bin); // 
     void printMachineCode(uint32_t bin, uint32_t pc); // for testing 
