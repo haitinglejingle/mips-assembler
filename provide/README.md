@@ -46,10 +46,10 @@ This will create a directory called _outputs_ that will hold four files.
 These will be `lab6.mi lab6.vhd pseudo.mi pseudo.vhd`. As well, this script will
 call make and will compile `mipsasm` in the project directory.
 
-`file.mi`
+`outputs/file.mi`
     - holds the ascii machine instructions with one instruction per line
 
-`file.vhd` 
+`outputs/file.vhd` 
     - holds the machine instructions in a way that makes copying and pasting
       into a vhdl file easy
 
