@@ -18,13 +18,32 @@
 
 \section*{Introduction}
 
+
+
 % TODO: provide background here
 % why a mips assembler? what's an assembler?
 
+Although programming languages consist of syntax and semantics reminiscent 
+of natural languages, all data in computers are encoded in binary bits that
+hold the state of either `1' or `0' with arbitrary meaning attached. A process
+of translating languages into machine code is needed and often performed by
+other kinds of programs. 
+
+Often, a high-level language may be compiled into an assembly language, the 
+lowest-level of abstraction from binary. From assembly, an assembler translates 
+assembly code into machine code in binary format readable to computers. 
+
+MIPS is an instruction set architecture (ISA) introduced in 1985 often used in 
+embedded systems and university courses. As a reduced instruction set 
+arcitecture (RISC), most assembly instructions in this ISA are simple such that
+the cycles per instruction are kept low. 
+
+In this course, a 5-stage pipeline was built in VHDL. This MIPS 32-bit assembler
+was built to help translate MIPS assembly instructions into machine code that 
+can be easily loaded into instruction memory in VHDL. 
+
 \section*{Specifications}
-%TODO: is it outputting in binary format? change this accordingly
-This MIPS-32 assembler translates assembly code into machine code in binary
-format. The program reads from a file specified as a command line argument
+This MIPS-32 assembler reads from a file specified as a command line argument
 or from stdin if a file is absent. The output is printed on stdout and can be
 piped into a file.
 
@@ -44,7 +63,7 @@ There were three tables used to lookup information used in the implementation.
 2. The register table maps the register name to its number in memory.
 
 3. The pseudoinstruction table maps a pseudoinstruction to the instructions
-it expanded into along with the order to pass in registers.
+it expands into along with the order to pass in registers.
 
 \subsection*{First Pass}
 Each line of assembly code in the program is read line-by-line and stored 
@@ -108,8 +127,8 @@ The use of lookup tables enabled the opcode, syntax group, and potential labels
 to each be found in constant time efficiency. 
 
 \section*{Conclusion}
-Improvements to this implementation of the assembler include expanding the ISA
-and adding macro capabilities.
+Improvements to this implementation of the assembler include adding more 
+instructions and macro capabilities.
 
 The set of instructions and pseudoinstructions can be easily expanded in this
 implementation by adding to the lookup table. The infrastructure for 
