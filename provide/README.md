@@ -1,7 +1,7 @@
 
 # MIPS Assembler
 
-Michelle Chan & Ashton Stephens
+by: Michelle Chan & Ashton Stephens
 
 ## Files
 ### Provided Files
