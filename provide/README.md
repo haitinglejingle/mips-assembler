@@ -3,20 +3,20 @@
 
 ## Files
 ### Provided Files
-- C++
-    - main.cpp 
-    - mipsasm.h
-    - mipsasm.cpp
-    - MIPS\_instruction.h
-    - MIPS\_instruction.cpp
-- Example Assembly    
-    - lab6.asm
-    - pseudo1.asm 
-- Others
-    - toVHD.py 
-    - report.pdf
-    - Makefile 
-    - run.sh   
+#### C++
+- main.cpp 
+- mipsasm.h
+- mipsasm.cpp
+- MIPS\_instruction.h
+- MIPS\_instruction.cpp
+#### Example Assembly    
+- lab6.asm
+- pseudo1.asm 
+#### Others
+- toVHD.py 
+- report.pdf
+- Makefile 
+- run.sh   
 
 ### Compiling
 
