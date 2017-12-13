@@ -1,6 +1,8 @@
 
 # MIPS Assembler
 
+By : Michelle Chan & Ashton Stephens
+
 ## Files
 ### Provided Files
 #### C++
