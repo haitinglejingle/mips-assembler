@@ -17,10 +17,6 @@
 \end{titlepage}
 
 \section*{Introduction}
-
-
-
-% TODO: provide background here
 % why a mips assembler? what's an assembler?
 
 Although programming languages consist of syntax and semantics reminiscent 
@@ -49,6 +45,7 @@ piped into a file.
 
 This assembler recognizes all 32 MIPS-32 registers and labels. A list of 
 supported instructions, including pseudo-instructions, are clearly listed in the
+``opcode\_code.h'' file provided.
 
 \section*{Implementation}
 
@@ -118,10 +115,11 @@ pseudoinstructions. The first file tests all pseudoinstructions included in the
 lookup table. The second file tests the integration of pseudoinstructions with
 a program with other instructions and labels. 
 
-% TODO: make this true
-Expected output files are provided to check for differences with the output of
-the assembler. For this assembler, all the tests used were passed.
-% explain tests passed and proof of functionality
+Two reference output files containing the programs in hex are provided based off
+the files with pseudoinstructions. They are used to check for differences with 
+the output of the assembler. Although the assembler currently outputs ASCII 
+binary, that output can be converted to hex using a script. For this assembler, 
+the tests used were passed.
 
 The use of lookup tables enabled the opcode, syntax group, and potential labels 
 to each be found in constant time efficiency. 
